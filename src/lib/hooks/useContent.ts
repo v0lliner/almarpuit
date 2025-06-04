@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '../supabase';
 import type { Database } from '../database.types';
 
@@ -17,6 +18,7 @@ export interface ContentData {
 }
 
 export function useContent(sectionKey: string): ContentData {
+  const { i18n } = useTranslation();
   const [translations, setTranslations] = useState<Record<string, { et: string; en: string }>>({});
   const [images, setImages] = useState<Record<string, { url: string; alt_text: string | null }>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -25,7 +27,6 @@ export function useContent(sectionKey: string): ContentData {
 
   const getOrCreateSection = async (key: string) => {
     try {
-      // Try to get the section first
       const { data: existingSection, error: fetchError } = await supabase
         .from('sections')
         .select('id')
@@ -34,20 +35,14 @@ export function useContent(sectionKey: string): ContentData {
 
       if (fetchError) throw fetchError;
 
-      // If section exists, return it
       if (existingSection) {
         setSectionId(existingSection.id);
         return existingSection;
       }
 
-      // Check if user is authenticated before creating a new section
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        // Return null for unauthenticated users
-        return null;
-      }
+      if (!session) return null;
 
-      // If user is authenticated and section doesn't exist, create it
       const { data: newSection, error: insertError } = await supabase
         .from('sections')
         .insert({ key })
@@ -64,22 +59,19 @@ export function useContent(sectionKey: string): ContentData {
     }
   };
 
-  const fetchContent = async () => {
+  const fetchContent = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Get or create section
       const sectionData = await getOrCreateSection(sectionKey);
 
-      // If no section data (unauthenticated user), set empty data
       if (!sectionData) {
         setTranslations({});
         setImages({});
         return;
       }
 
-      // Get translations and images in parallel
       const [translationsResponse, imagesResponse] = await Promise.all([
         supabase
           .from('translations')
@@ -94,16 +86,20 @@ export function useContent(sectionKey: string): ContentData {
       if (translationsResponse.error) throw translationsResponse.error;
       if (imagesResponse.error) throw imagesResponse.error;
 
-      // Process translations
       const translationsMap = translationsResponse.data.reduce((acc, item) => ({
         ...acc,
-        [item.key]: { et: item.et || '', en: item.en || '' }
+        [item.key]: { 
+          et: item.et || '', 
+          en: item.en || '' 
+        }
       }), {});
 
-      // Process images
       const imagesMap = imagesResponse.data.reduce((acc, item) => ({
         ...acc,
-        [item.key]: { url: item.url, alt_text: item.alt_text }
+        [item.key]: { 
+          url: item.url, 
+          alt_text: item.alt_text 
+        }
       }), {});
 
       setTranslations(translationsMap);
@@ -115,7 +111,7 @@ export function useContent(sectionKey: string): ContentData {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [sectionKey]);
 
   const updateTranslation = async (key: string, lang: 'et' | 'en', value: string) => {
     if (!sectionId) {
@@ -123,7 +119,6 @@ export function useContent(sectionKey: string): ContentData {
     }
 
     try {
-      // Update local state immediately for better UX
       setTranslations(prev => ({
         ...prev,
         [key]: {
@@ -144,7 +139,6 @@ export function useContent(sectionKey: string): ContentData {
 
       if (error) throw error;
     } catch (err) {
-      // Revert local state on error
       await fetchContent();
       const errorMessage = err instanceof Error ? err.message : 'Failed to update translation';
       console.error('Error in updateTranslation:', err);
@@ -158,7 +152,6 @@ export function useContent(sectionKey: string): ContentData {
     }
 
     try {
-      // Update local state immediately for better UX
       setImages(prev => ({
         ...prev,
         [key]: { url, alt_text: alt_text || null }
@@ -177,7 +170,6 @@ export function useContent(sectionKey: string): ContentData {
 
       if (error) throw error;
     } catch (err) {
-      // Revert local state on error
       await fetchContent();
       const errorMessage = err instanceof Error ? err.message : 'Failed to update image';
       console.error('Error in updateImage:', err);
@@ -185,14 +177,15 @@ export function useContent(sectionKey: string): ContentData {
     }
   };
 
+  // Fetch content when section key or language changes
   useEffect(() => {
     fetchContent();
-  }, [sectionKey]); // Fetch content when section key changes
+  }, [fetchContent, i18n.language]);
 
+  // Set up real-time subscriptions
   useEffect(() => {
     if (!sectionId) return;
 
-    // Set up real-time subscriptions
     const channel = supabase
       .channel(`content_changes_${sectionId}`)
       .on('postgres_changes', {
@@ -221,7 +214,7 @@ export function useContent(sectionKey: string): ContentData {
       console.log(`Unsubscribing from section ${sectionId} changes...`);
       channel.unsubscribe();
     };
-  }, [sectionId]); // Only re-run when sectionId changes
+  }, [sectionId, fetchContent]);
 
   return {
     translations,

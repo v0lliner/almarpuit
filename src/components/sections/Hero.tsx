@@ -1,13 +1,19 @@
 import { useTranslation } from 'react-i18next';
 import { useContent } from '../../lib/hooks/useContent';
 import Button from '../Button';
+import { Loader2 } from 'lucide-react';
 
 const Hero = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { translations, images, isLoading } = useContent('hero');
+  const currentLang = i18n.language;
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <section id="hero" className="relative h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-forest-600 animate-spin" />
+      </section>
+    );
   }
 
   return (
@@ -26,17 +32,17 @@ const Hero = () => {
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 drop-shadow-lg">
-          {translations.title?.et || t('hero.title')}
+          {translations.title?.[currentLang] || t('hero.title')}
         </h1>
         <p className="text-xl md:text-2xl text-white mb-8 max-w-2xl mx-auto drop-shadow-md">
-          {translations.subtitle?.et || t('hero.subtitle')}
+          {translations.subtitle?.[currentLang] || t('hero.subtitle')}
         </p>
         <Button 
           to="products"
           variant="primary"
           className="text-lg px-8 py-4"
         >
-          {translations.cta?.et || t('hero.cta')}
+          {translations.cta?.[currentLang] || t('hero.cta')}
         </Button>
       </div>
     </section>
