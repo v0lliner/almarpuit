@@ -51,11 +51,11 @@ const Contact = () => {
       
       <div className="flex flex-col space-y-8">
         {/* Top Section - Two Columns */}
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-8 min-h-[600px]">
           {/* Left Column - Contact Information */}
-          <div className="space-y-6">
+          <div className="flex flex-col space-y-6 h-full">
             {/* Industry Address */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-md p-6 flex-1">
               <h3 className="text-xl font-bold mb-4 text-forest-800">
                 {translations.businessAddressTitle?.[currentLang] || t('contact.industryAddress')}
               </h3>
@@ -66,7 +66,7 @@ const Contact = () => {
             </div>
 
             {/* Legal Address */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-md p-6 flex-1">
               <h3 className="text-xl font-bold mb-4 text-forest-800">
                 {translations.legalAddressTitle?.[currentLang] || t('contact.legalAddress')}
               </h3>
@@ -77,7 +77,7 @@ const Contact = () => {
             </div>
 
             {/* Contact Details */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow-md p-6 flex-1">
               <h3 className="text-xl font-bold mb-4 text-forest-800">
                 {translations.contactTitle?.[currentLang] || t('contact.contactPerson')}
               </h3>
@@ -103,7 +103,7 @@ const Contact = () => {
           </div>
 
           {/* Right Column - Contact Form */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white rounded-lg shadow-md p-6 h-full flex flex-col">
             <h3 className="text-xl font-bold mb-6 text-forest-800">
               {translations.formTitle?.[currentLang] || t('contact.title')}
             </h3>
@@ -124,7 +124,7 @@ const Contact = () => {
               </div>
             ) : null}
             
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1 space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-stone-700 mb-2">
                   {translations.formLabelName?.[currentLang] || t('contact.formName')}
@@ -155,7 +155,7 @@ const Contact = () => {
                 />
               </div>
               
-              <div>
+              <div className="flex-1">
                 <label htmlFor="message" className="block text-sm font-medium text-stone-700 mb-2">
                   {translations.formLabelMessage?.[currentLang] || t('contact.formMessage')}
                 </label>
@@ -165,15 +165,14 @@ const Contact = () => {
                   value={formData.message}
                   onChange={handleChange}
                   required
-                  rows={5}
-                  className="w-full px-4 py-3 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-forest-500"
+                  className="w-full h-full min-h-[200px] px-4 py-3 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-forest-500 focus:border-forest-500"
                 ></textarea>
               </div>
               
               <Button 
                 type="submit" 
                 variant="primary"
-                className="w-full py-4 text-lg font-medium"
+                className="w-full py-4 text-lg font-medium mt-auto"
               >
                 {translations.formLabelSubmit?.[currentLang] || t('contact.formSubmit')}
               </Button>
