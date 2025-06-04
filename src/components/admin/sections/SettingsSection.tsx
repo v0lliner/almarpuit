@@ -70,6 +70,8 @@ export default function SettingsSection() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-forest-800">Üldised seaded</h2>
         <button
+          type="submit"
+          form="settings-form"
           disabled={saveStatus === 'saving'}
           className={`px-4 py-2 rounded-md font-medium flex items-center space-x-2 ${
             saveStatus === 'saving' 
@@ -109,7 +111,7 @@ export default function SettingsSection() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form id="settings-form" onSubmit={handleSubmit} className="space-y-8">
         {/* Company Information */}
         <div className="bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Ettevõtte info</h3>
@@ -122,9 +124,9 @@ export default function SettingsSection() {
                 type="text"
                 id="company_name"
                 name="company_name"
-                defaultValue={settings?.company_name}
+                defaultValue={settings.company_name}
                 required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-forest-500 focus:ring-forest-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-forest-500 focus:ring-1 focus:ring-forest-500"
               />
             </div>
 
@@ -136,9 +138,9 @@ export default function SettingsSection() {
                 type="text"
                 id="industry_address"
                 name="industry_address"
-                defaultValue={settings?.industry_address}
+                defaultValue={settings.industry_address}
                 required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-forest-500 focus:ring-forest-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-forest-500 focus:ring-1 focus:ring-forest-500"
               />
             </div>
 
@@ -150,9 +152,9 @@ export default function SettingsSection() {
                 type="text"
                 id="legal_address"
                 name="legal_address"
-                defaultValue={settings?.legal_address}
+                defaultValue={settings.legal_address}
                 required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-forest-500 focus:ring-forest-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-forest-500 focus:ring-1 focus:ring-forest-500"
               />
             </div>
 
@@ -164,10 +166,10 @@ export default function SettingsSection() {
                 type="tel"
                 id="contact_phone"
                 name="contact_phone"
-                defaultValue={settings?.contact_phone}
+                defaultValue={settings.contact_phone}
                 required
                 pattern="^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-forest-500 focus:ring-forest-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-forest-500 focus:ring-1 focus:ring-forest-500"
               />
             </div>
 
@@ -179,9 +181,9 @@ export default function SettingsSection() {
                 type="email"
                 id="contact_email"
                 name="contact_email"
-                defaultValue={settings?.contact_email}
+                defaultValue={settings.contact_email}
                 required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-forest-500 focus:ring-forest-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-forest-500 focus:ring-1 focus:ring-forest-500"
               />
             </div>
           </div>
@@ -198,9 +200,9 @@ export default function SettingsSection() {
               type="email"
               id="form_target_email"
               name="form_target_email"
-              defaultValue={settings?.form_target_email}
+              defaultValue={settings.form_target_email}
               required
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-forest-500 focus:ring-forest-500"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-forest-500 focus:ring-1 focus:ring-forest-500"
             />
             <p className="mt-1 text-sm text-gray-500">
               E-posti aadress, kuhu saadetakse kontaktvormi teavitused
@@ -225,10 +227,10 @@ export default function SettingsSection() {
                     type="text"
                     id="meta_title_et"
                     name="meta_title_et"
-                    defaultValue={settings?.meta_title?.et}
+                    defaultValue={settings.meta_title.et}
                     maxLength={60}
                     required
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-forest-500 focus:ring-forest-500"
+                    className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-forest-500 focus:ring-1 focus:ring-forest-500"
                   />
                 </div>
                 <div>
@@ -239,10 +241,10 @@ export default function SettingsSection() {
                     type="text"
                     id="meta_title_en"
                     name="meta_title_en"
-                    defaultValue={settings?.meta_title?.en}
+                    defaultValue={settings.meta_title.en}
                     maxLength={60}
                     required
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-forest-500 focus:ring-forest-500"
+                    className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-forest-500 focus:ring-1 focus:ring-forest-500"
                   />
                 </div>
               </div>
@@ -263,11 +265,11 @@ export default function SettingsSection() {
                   <textarea
                     id="meta_description_et"
                     name="meta_description_et"
-                    defaultValue={settings?.meta_description?.et}
+                    defaultValue={settings.meta_description.et}
                     maxLength={160}
                     required
                     rows={3}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-forest-500 focus:ring-forest-500"
+                    className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-forest-500 focus:ring-1 focus:ring-forest-500"
                   />
                 </div>
                 <div>
@@ -277,11 +279,11 @@ export default function SettingsSection() {
                   <textarea
                     id="meta_description_en"
                     name="meta_description_en"
-                    defaultValue={settings?.meta_description?.en}
+                    defaultValue={settings.meta_description.en}
                     maxLength={160}
                     required
                     rows={3}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-forest-500 focus:ring-forest-500"
+                    className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-forest-500 focus:ring-1 focus:ring-forest-500"
                   />
                 </div>
               </div>

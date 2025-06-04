@@ -57,7 +57,6 @@ export function useGlobalSettings() {
     } catch (err) {
       console.error('Error fetching settings:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch settings');
-      // Still set default settings even if there's an error
       setSettings(defaultSettings);
     } finally {
       setIsLoading(false);
