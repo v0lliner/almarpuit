@@ -4,7 +4,8 @@
     "about": "Meist",
     "products": "Tooted",
     "woodPurchase": "Puidu kokkuost",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "navigation": "Navigatsioon"
   },
   "hero": {
     "title": "Tere tulemast OÜ Almar Puit kodulehele!",
@@ -46,6 +47,8 @@
     "formError": "Vabandame, sõnumi saatmisel tekkis viga. Palun proovige uuesti või võtke meiega ühendust telefoni teel."
   },
   "footer": {
-    "copyright": "© 2023 OÜ Almar Puit. Kõik õigused kaitstud."
+    "about": "Meist",
+    "navigation": "Navigatsioon",
+    "copyright": "Kõik õigused kaitstud."
   }
 }

@@ -4,7 +4,8 @@
     "about": "About",
     "products": "Products",
     "woodPurchase": "Wood Purchase",
-    "contact": "Contact"
+    "contact": "Contact",
+    "navigation": "Navigation"
   },
   "hero": {
     "title": "Welcome to OÜ Almar Puit!",
@@ -46,6 +47,8 @@
     "formError": "Sorry, there was an error sending your message. Please try again or contact us by phone."
   },
   "footer": {
-    "copyright": "© 2023 OÜ Almar Puit. All rights reserved."
+    "about": "About Us",
+    "navigation": "Navigation",
+    "copyright": "All rights reserved."
   }
 }
