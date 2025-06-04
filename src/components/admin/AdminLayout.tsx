@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import AdminHeader from './AdminHeader';
@@ -6,12 +6,20 @@ import AdminSidebar from './AdminSidebar';
 
 export default function AdminLayout() {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          navigate('/admin/login');
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
         navigate('/admin/login');
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -25,6 +33,14 @@ export default function AdminLayout() {
 
     return () => subscription.unsubscribe();
   }, [navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-forest-600">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">

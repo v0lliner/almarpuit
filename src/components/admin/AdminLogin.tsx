@@ -1,23 +1,37 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../../lib/supabase';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
 
     try {
-      // TODO: Implement Supabase authentication
-      console.log('Login attempted with:', email);
-      navigate('/admin/dashboard');
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (signInError) {
+        throw signInError;
+      }
+
+      if (data.session) {
+        navigate('/admin');
+      }
     } catch (err) {
       setError('Login failed. Please check your credentials.');
       console.error('Login error:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -44,6 +58,7 @@ const AdminLogin = () => {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-forest-500"
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -58,14 +73,16 @@ const AdminLogin = () => {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-forest-500"
               required
+              disabled={isLoading}
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-forest-600 text-white py-2 px-4 rounded-md hover:bg-forest-700 focus:outline-none focus:ring-2 focus:ring-forest-500 focus:ring-offset-2"
+            className="w-full bg-forest-600 text-white py-2 px-4 rounded-md hover:bg-forest-700 focus:outline-none focus:ring-2 focus:ring-forest-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isLoading}
           >
-            Log In
+            {isLoading ? 'Logging in...' : 'Log In'}
           </button>
         </form>
       </div>
