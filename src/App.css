@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-stone-50 text-stone-800;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+@layer components {
+  .section {
+    @apply py-16 md:py-24 px-4 max-w-7xl mx-auto;
+  }
+  
+  .section-title {
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold text-forest-700 mb-8 relative;
+  }
+  
+  .section-title::after {
+    @apply content-[''] block w-16 h-1 bg-amber-600 mt-3;
+  }
+  
+  .btn {
+    @apply px-6 py-3 rounded-md font-medium transition-all duration-300;
+  }
+  
+  .btn-primary {
+    @apply btn bg-forest-600 text-white hover:bg-forest-700 focus:ring-4 focus:ring-forest-300;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-amber-500 text-white hover:bg-amber-600 focus:ring-4 focus:ring-amber-300;
+  }
+  
+  .btn-outline {
+    @apply btn border-2 border-forest-600 text-forest-600 hover:bg-forest-50;
+  }
+  
+  .fade-in {
+    @apply opacity-0 transition-opacity duration-1000;
+  }
+  
+  .fade-in.visible {
+    @apply opacity-100;
+  }
+}
+
+.slide-up {
+  transform: translateY(30px);
+  opacity: 0;
+  transition: transform 0.6s ease-out, opacity 0.6s ease-out;
+}
+
+.slide-up.visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.stagger-delay-1 {
+  transition-delay: 0.1s;
+}
+
+.stagger-delay-2 {
+  transition-delay: 0.2s;
+}
+
+.stagger-delay-3 {
+  transition-delay: 0.3s;
+}

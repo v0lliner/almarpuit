@@ -1,0 +1,51 @@
+{
+  "header": {
+    "home": "Home",
+    "about": "About",
+    "products": "Products",
+    "woodPurchase": "Wood Purchase",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Welcome to OÜ Almar Puit!",
+    "subtitle": "High-quality, eco-friendly wood products for your home and business.",
+    "cta": "Explore our products"
+  },
+  "about": {
+    "title": "About Us",
+    "description": "Founded in 2006 in Southeast Estonia, OÜ Almar Puit brings nature closer to you. We offer eco-friendly solutions for gardens and recreational areas, alongside premium heating and fireplace wood. Our commitment to innovation shines through PRIA funding, enabling us to automate production for top quality and fast delivery."
+  },
+  "products": {
+    "title": "Our Products",
+    "fireplaceWood": {
+      "title": "Fireplace Wood",
+      "description": "Enjoy warmth with our year-round dried fireplace wood. We offer 30 cm and 25 cm birch logs, packaged in 40L bags or 2 m³ crates – the perfect choice for your fireplace."
+    },
+    "heatingWood": {
+      "title": "Heating Wood",
+      "description": "Premium heating wood for stoves and furnaces, customizable to your desired length. We guarantee dry wood availability year-round."
+    }
+  },
+  "woodPurchase": {
+    "title": "Wood Purchase",
+    "description": "We're looking for reliable suppliers! We purchase birch paper wood, 3 m heating wood, and limited quantities of logs. Contact us to start a partnership.",
+    "cta": "Offer your wood"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "industryAddress": "Industry Address",
+    "industryAddressValue": "Tobrokamäe 4, Mikitamäe village, Mikitamäe parish, Põlva County",
+    "legalAddress": "Legal Address",
+    "legalAddressValue": "Kastani 12, Räpina city, Põlva County 64506",
+    "contactPerson": "Contact",
+    "formName": "Name",
+    "formEmail": "Email",
+    "formMessage": "Message",
+    "formSubmit": "Send",
+    "formSuccess": "Your message has been sent. We'll be in touch soon!",
+    "formError": "Sorry, there was an error sending your message. Please try again or contact us by phone."
+  },
+  "footer": {
+    "copyright": "© 2023 OÜ Almar Puit. All rights reserved."
+  }
+}

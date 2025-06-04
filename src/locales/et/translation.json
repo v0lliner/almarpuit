@@ -1,0 +1,51 @@
+{
+  "header": {
+    "home": "Kodu",
+    "about": "Meist",
+    "products": "Tooted",
+    "woodPurchase": "Puidu kokkuost",
+    "contact": "Kontakt"
+  },
+  "hero": {
+    "title": "Tere tulemast OÜ Almar Puit kodulehele!",
+    "subtitle": "Kvaliteetsed ja loodussõbralikud puittooted Teie kodule ja ärile.",
+    "cta": "Tutvu meie toodetega"
+  },
+  "about": {
+    "title": "Meist",
+    "description": "OÜ Almar Puit on 2006. aastal Kagu-Eestis asutatud ettevõte, mis toob looduse lähemale. Pakume keskkonnasõbralikke lahendusi koduaedadele ja puhkealadele ning kvaliteetseid kütte- ja kaminapuid. Meie pühendumus innovatsioonile paistab silma PRIA toetustega, mis on aidanud meil automatiseerida tootmisprotsessi, tagades parima kvaliteedi ja kiire tarne."
+  },
+  "products": {
+    "title": "Meie tooted",
+    "fireplaceWood": {
+      "title": "Kaminapuu",
+      "description": "Naudi soojust meie aastaringselt kuivatatud kaminapuudega. Pakume 30 cm ja 25 cm kasehalge, pakendatuna 40 l kottidesse või 2 m³ kastidesse – täiuslik valik Sinu kaminasse."
+    },
+    "heatingWood": {
+      "title": "Küttepuud",
+      "description": "Kvaliteetsed küttepuud ahjudele ja pliitidele, kohandatavad Sinu soovitud pikkusele. Garanteerime kuiva puidu kättesaadavuse igal ajal aastas."
+    }
+  },
+  "woodPurchase": {
+    "title": "Puidu kokkuost",
+    "description": "Otsime usaldusväärseid tarnijaid! Ostame kasepaberipuid, 3 m küttepuud ja piiratud koguses palki. Võta ühendust ja alustame koostööd.",
+    "cta": "Paku oma puitu"
+  },
+  "contact": {
+    "title": "Kontakt",
+    "industryAddress": "Tööstuse aadress",
+    "industryAddressValue": "Tobrokamäe 4, Mikitamäe küla, Mikitamäe vald, Põlvamaa",
+    "legalAddress": "Juriidiline aadress",
+    "legalAddressValue": "Kastani 12, Räpina linn, Põlvamaa 64506",
+    "contactPerson": "Kontakt",
+    "formName": "Nimi",
+    "formEmail": "E-post",
+    "formMessage": "Sõnum",
+    "formSubmit": "Saada",
+    "formSuccess": "Teie sõnum on saadetud. Täname teiega peatset ühendust!",
+    "formError": "Vabandame, sõnumi saatmisel tekkis viga. Palun proovige uuesti või võtke meiega ühendust telefoni teel."
+  },
+  "footer": {
+    "copyright": "© 2023 OÜ Almar Puit. Kõik õigused kaitstud."
+  }
+}
