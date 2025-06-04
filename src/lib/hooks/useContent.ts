@@ -14,7 +14,6 @@ export interface ContentData {
   refetch: () => Promise<void>;
   updateTranslation: (key: string, lang: 'et' | 'en', value: string) => Promise<void>;
   updateImage: (key: string, url: string, alt_text?: string) => Promise<void>;
-  saveChanges: () => Promise<void>;
 }
 
 export function useContent(sectionKey: string): ContentData {
@@ -22,13 +21,6 @@ export function useContent(sectionKey: string): ContentData {
   const [images, setImages] = useState<Record<string, { url: string; alt_text: string | null }>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [pendingChanges, setPendingChanges] = useState<{
-    translations: Record<string, { et?: string; en?: string }>;
-    images: Record<string, { url?: string; alt_text?: string | null }>;
-  }>({
-    translations: {},
-    images: {},
-  });
 
   const fetchContent = async () => {
     try {
@@ -74,7 +66,6 @@ export function useContent(sectionKey: string): ContentData {
 
       setTranslations(translationsMap);
       setImages(imagesMap);
-      setPendingChanges({ translations: {}, images: {} });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -84,49 +75,33 @@ export function useContent(sectionKey: string): ContentData {
 
   const updateTranslation = async (key: string, lang: 'et' | 'en', value: string) => {
     try {
-      setPendingChanges(prev => ({
-        ...prev,
-        translations: {
-          ...prev.translations,
-          [key]: {
-            ...prev.translations[key],
-            [lang]: value
-          }
-        }
-      }));
+      const { data: sectionData } = await supabase
+        .from('sections')
+        .select('id')
+        .eq('key', sectionKey)
+        .single();
 
-      setTranslations(prev => ({
-        ...prev,
-        [key]: {
-          ...prev[key],
+      if (!sectionData) throw new Error('Section not found');
+
+      const { error } = await supabase
+        .from('translations')
+        .upsert({
+          section_id: sectionData.id,
+          key,
           [lang]: value
-        }
-      }));
+        }, {
+          onConflict: 'section_id,key'
+        });
+
+      if (error) throw error;
+
+      await fetchContent();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update translation');
     }
   };
 
   const updateImage = async (key: string, url: string, alt_text?: string) => {
-    try {
-      setPendingChanges(prev => ({
-        ...prev,
-        images: {
-          ...prev.images,
-          [key]: { url, alt_text: alt_text || null }
-        }
-      }));
-
-      setImages(prev => ({
-        ...prev,
-        [key]: { url, alt_text: alt_text || null }
-      }));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update image');
-    }
-  };
-
-  const saveChanges = async () => {
     try {
       const { data: sectionData } = await supabase
         .from('sections')
@@ -136,40 +111,22 @@ export function useContent(sectionKey: string): ContentData {
 
       if (!sectionData) throw new Error('Section not found');
 
-      // Save translations
-      for (const [key, value] of Object.entries(pendingChanges.translations)) {
-        const { error } = await supabase
-          .from('translations')
-          .upsert({
-            section_id: sectionData.id,
-            key,
-            ...value
-          }, {
-            onConflict: 'section_id,key'
-          });
+      const { error } = await supabase
+        .from('images')
+        .upsert({
+          section_id: sectionData.id,
+          key,
+          url,
+          alt_text: alt_text || null
+        }, {
+          onConflict: 'section_id,key'
+        });
 
-        if (error) throw error;
-      }
+      if (error) throw error;
 
-      // Save images
-      for (const [key, value] of Object.entries(pendingChanges.images)) {
-        const { error } = await supabase
-          .from('images')
-          .upsert({
-            section_id: sectionData.id,
-            key,
-            ...value
-          }, {
-            onConflict: 'section_id,key'
-          });
-
-        if (error) throw error;
-      }
-
-      // Reset pending changes
-      setPendingChanges({ translations: {}, images: {} });
+      await fetchContent();
     } catch (err) {
-      throw err;
+      setError(err instanceof Error ? err.message : 'Failed to update image');
     }
   };
 
@@ -184,7 +141,6 @@ export function useContent(sectionKey: string): ContentData {
     error,
     refetch: fetchContent,
     updateTranslation,
-    updateImage,
-    saveChanges
+    updateImage
   };
 }
