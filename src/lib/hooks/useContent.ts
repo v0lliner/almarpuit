@@ -175,16 +175,18 @@ export function useContent(sectionKey: string): ContentData {
 
     // Set up real-time subscriptions
     const channel = supabase
-      .channel('content_changes')
+      .channel(`content_changes_${sectionKey}`)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
-        table: 'translations'
+        table: 'translations',
+        filter: `section_id.eq.${sectionKey}`
       }, fetchContent)
       .on('postgres_changes', {
         event: '*',
         schema: 'public',
-        table: 'images'
+        table: 'images',
+        filter: `section_id.eq.${sectionKey}`
       }, fetchContent)
       .subscribe();
 
