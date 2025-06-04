@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
+import { ArrowLeft } from 'lucide-react';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -38,7 +39,16 @@ const AdminLogin = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-stone-100">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-        <h2 className="text-2xl font-bold text-forest-800 mb-6">Administraatori sisselogimine</h2>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-bold text-forest-800">Administraatori sisselogimine</h2>
+          <Link 
+            to="/" 
+            className="flex items-center text-forest-600 hover:text-forest-700 transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5 mr-2" />
+            <span>Tagasi avalehele</span>
+          </Link>
+        </div>
         
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
