@@ -59,8 +59,8 @@ const Contact = () => {
               <h3 className="text-xl font-bold mb-4 text-forest-800">
                 {translations.businessAddressTitle?.[currentLang] || t('contact.industryAddress')}
               </h3>
-              <div className="flex items-start">
-                <MapPin className="text-forest-600 mt-1 mr-3 h-5 w-5 flex-shrink-0" />
+              <div className="flex items-center h-[calc(100%-2rem)]">
+                <MapPin className="text-forest-600 mr-3 h-5 w-5 flex-shrink-0" />
                 <p>{translations.businessAddress?.[currentLang] || t('contact.industryAddressValue')}</p>
               </div>
             </div>
@@ -70,8 +70,8 @@ const Contact = () => {
               <h3 className="text-xl font-bold mb-4 text-forest-800">
                 {translations.legalAddressTitle?.[currentLang] || t('contact.legalAddress')}
               </h3>
-              <div className="flex items-start">
-                <MapPin className="text-forest-600 mt-1 mr-3 h-5 w-5 flex-shrink-0" />
+              <div className="flex items-center h-[calc(100%-2rem)]">
+                <MapPin className="text-forest-600 mr-3 h-5 w-5 flex-shrink-0" />
                 <p>{translations.legalAddress?.[currentLang] || t('contact.legalAddressValue')}</p>
               </div>
             </div>
