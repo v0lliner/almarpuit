@@ -79,30 +79,29 @@ export function useContent(sectionKey: string): ContentData {
         return;
       }
 
-      // Get translations
-      const { data: translationsData, error: translationsError } = await supabase
-        .from('translations')
-        .select('*')
-        .eq('section_id', sectionData.id);
+      // Get translations and images in parallel
+      const [translationsResponse, imagesResponse] = await Promise.all([
+        supabase
+          .from('translations')
+          .select('*')
+          .eq('section_id', sectionData.id),
+        supabase
+          .from('images')
+          .select('*')
+          .eq('section_id', sectionData.id)
+      ]);
 
-      if (translationsError) throw translationsError;
-
-      // Get images
-      const { data: imagesData, error: imagesError } = await supabase
-        .from('images')
-        .select('*')
-        .eq('section_id', sectionData.id);
-
-      if (imagesError) throw imagesError;
+      if (translationsResponse.error) throw translationsResponse.error;
+      if (imagesResponse.error) throw imagesResponse.error;
 
       // Process translations
-      const translationsMap = translationsData.reduce((acc, item) => ({
+      const translationsMap = translationsResponse.data.reduce((acc, item) => ({
         ...acc,
         [item.key]: { et: item.et || '', en: item.en || '' }
       }), {});
 
       // Process images
-      const imagesMap = imagesData.reduce((acc, item) => ({
+      const imagesMap = imagesResponse.data.reduce((acc, item) => ({
         ...acc,
         [item.key]: { url: item.url, alt_text: item.alt_text }
       }), {});
@@ -110,8 +109,9 @@ export function useContent(sectionKey: string): ContentData {
       setTranslations(translationsMap);
       setImages(imagesMap);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
       console.error('Error in fetchContent:', err);
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -123,6 +123,15 @@ export function useContent(sectionKey: string): ContentData {
     }
 
     try {
+      // Update local state immediately for better UX
+      setTranslations(prev => ({
+        ...prev,
+        [key]: {
+          ...prev[key],
+          [lang]: value
+        }
+      }));
+
       const { error } = await supabase
         .from('translations')
         .upsert({
@@ -134,19 +143,12 @@ export function useContent(sectionKey: string): ContentData {
         });
 
       if (error) throw error;
-
-      // Update local state immediately for better UX
-      setTranslations(prev => ({
-        ...prev,
-        [key]: {
-          ...prev[key],
-          [lang]: value
-        }
-      }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update translation');
+      // Revert local state on error
+      await fetchContent();
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update translation';
       console.error('Error in updateTranslation:', err);
-      throw err;
+      throw new Error(errorMessage);
     }
   };
 
@@ -156,6 +158,12 @@ export function useContent(sectionKey: string): ContentData {
     }
 
     try {
+      // Update local state immediately for better UX
+      setImages(prev => ({
+        ...prev,
+        [key]: { url, alt_text: alt_text || null }
+      }));
+
       const { error } = await supabase
         .from('images')
         .upsert({
@@ -168,44 +176,51 @@ export function useContent(sectionKey: string): ContentData {
         });
 
       if (error) throw error;
-
-      // Update local state immediately for better UX
-      setImages(prev => ({
-        ...prev,
-        [key]: { url, alt_text: alt_text || null }
-      }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update image');
+      // Revert local state on error
+      await fetchContent();
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update image';
       console.error('Error in updateImage:', err);
-      throw err;
+      throw new Error(errorMessage);
     }
   };
 
   useEffect(() => {
     fetchContent();
+  }, [sectionKey]); // Fetch content when section key changes
 
-    // Set up real-time subscriptions only if we have a section ID
-    if (sectionId) {
-      const channel = supabase
-        .channel(`content_changes_${sectionId}`)
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'translations',
-          filter: `section_id=eq.${sectionId}`
-        }, fetchContent)
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'images',
-          filter: `section_id=eq.${sectionId}`
-        }, fetchContent)
-        .subscribe();
+  useEffect(() => {
+    if (!sectionId) return;
 
-      return () => {
-        channel.unsubscribe();
-      };
-    }
+    // Set up real-time subscriptions
+    const channel = supabase
+      .channel(`content_changes_${sectionId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'translations',
+        filter: `section_id=eq.${sectionId}`
+      }, () => {
+        console.log('Translation change detected, refreshing content...');
+        fetchContent();
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'images',
+        filter: `section_id=eq.${sectionId}`
+      }, () => {
+        console.log('Image change detected, refreshing content...');
+        fetchContent();
+      })
+      .subscribe((status) => {
+        console.log(`Subscription status for section ${sectionId}:`, status);
+      });
+
+    return () => {
+      console.log(`Unsubscribing from section ${sectionId} changes...`);
+      channel.unsubscribe();
+    };
   }, [sectionId]); // Only re-run when sectionId changes
 
   return {
