@@ -95,9 +95,34 @@ export function useContent(sectionKey: string): ContentData {
 
       if (error) throw error;
 
-      await fetchContent();
+      // Update local state immediately
+      setTranslations(prev => ({
+        ...prev,
+        [key]: {
+          ...prev[key],
+          [lang]: value
+        }
+      }));
+
+      // Subscribe to changes
+      const channel = supabase
+        .channel('translation_changes')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'translations',
+          filter: `section_id=eq.${sectionData.id}`
+        }, () => {
+          fetchContent();
+        })
+        .subscribe();
+
+      return () => {
+        channel.unsubscribe();
+      };
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update translation');
+      throw err;
     }
   };
 
@@ -124,14 +149,55 @@ export function useContent(sectionKey: string): ContentData {
 
       if (error) throw error;
 
-      await fetchContent();
+      // Update local state immediately
+      setImages(prev => ({
+        ...prev,
+        [key]: { url, alt_text: alt_text || null }
+      }));
+
+      // Subscribe to changes
+      const channel = supabase
+        .channel('image_changes')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'images',
+          filter: `section_id=eq.${sectionData.id}`
+        }, () => {
+          fetchContent();
+        })
+        .subscribe();
+
+      return () => {
+        channel.unsubscribe();
+      };
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update image');
+      throw err;
     }
   };
 
   useEffect(() => {
     fetchContent();
+
+    // Set up real-time subscriptions
+    const channel = supabase
+      .channel('content_changes')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'translations'
+      }, fetchContent)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'images'
+      }, fetchContent)
+      .subscribe();
+
+    return () => {
+      channel.unsubscribe();
+    };
   }, [sectionKey]);
 
   return {
