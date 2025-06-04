@@ -4,6 +4,7 @@ import AboutSection from './sections/AboutSection';
 import ProductsSection from './sections/ProductsSection';
 import WoodPurchaseSection from './sections/WoodPurchaseSection';
 import ContactSection from './sections/ContactSection';
+import SettingsSection from './sections/SettingsSection';
 
 export default function AdminRoutes() {
   return (
@@ -14,6 +15,7 @@ export default function AdminRoutes() {
       <Route path="/products" element={<ProductsSection />} />
       <Route path="/wood-purchase" element={<WoodPurchaseSection />} />
       <Route path="/contact" element={<ContactSection />} />
+      <Route path="/settings" element={<SettingsSection />} />
       <Route path="*" element={<div>Lehte ei leitud</div>} />
     </Routes>
   );
