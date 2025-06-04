@@ -4,7 +4,7 @@ import { useContent } from '../../../lib/hooks/useContent';
 import { supabase } from '../../../lib/supabase';
 import { Loader2, Upload, X, Check } from 'lucide-react';
 
-export default function AboutSection() {
+export default function WoodPurchaseSection() {
   const {
     translations,
     images,
@@ -13,7 +13,7 @@ export default function AboutSection() {
     updateTranslation,
     updateImage,
     refetch
-  } = useContent('about');
+  } = useContent('woodPurchase');
 
   const [isSaving, setIsSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -44,7 +44,7 @@ export default function AboutSection() {
 
       const fileExt = file.name.split('.').pop();
       const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `about/${fileName}`;
+      const filePath = `woodPurchase/${fileName}`;
 
       const { error: uploadError, data } = await supabase.storage
         .from('images')
@@ -109,7 +109,7 @@ export default function AboutSection() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-forest-800">Meist sektsioon</h2>
+        <h2 className="text-2xl font-bold text-forest-800">Puidu kokkuost</h2>
         <button
           onClick={handleSaveAll}
           disabled={saveStatus === 'saving'}
@@ -213,9 +213,40 @@ export default function AboutSection() {
             </div>
           </div>
 
-          {/* Background Image */}
+          {/* CTA Button Text */}
           <div>
-            <h3 className="text-lg font-medium mb-2">Taustapilt</h3>
+            <h3 className="text-lg font-medium mb-2">Tegevusnupu tekst</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Eesti keeles
+                </label>
+                <input
+                  type="text"
+                  className="w-full p-2 border rounded-md"
+                  value={translations.cta?.et || ''}
+                  onChange={(e) => handleTranslationChange('cta', 'et', e.target.value)}
+                  placeholder="Sisesta nupu tekst eesti keeles"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Inglise keeles
+                </label>
+                <input
+                  type="text"
+                  className="w-full p-2 border rounded-md"
+                  value={translations.cta?.en || ''}
+                  onChange={(e) => handleTranslationChange('cta', 'en', e.target.value)}
+                  placeholder="Enter button text in English"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Optional Image */}
+          <div>
+            <h3 className="text-lg font-medium mb-2">Pilt (valikuline)</h3>
             
             {/* Image Preview */}
             {images.background?.url && (

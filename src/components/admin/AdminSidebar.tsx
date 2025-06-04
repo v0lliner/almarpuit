@@ -7,8 +7,6 @@ import {
   TreeDeciduousIcon,
   Phone,
   Settings,
-  Image,
-  Globe
 } from 'lucide-react';
 
 const navigation = [
@@ -18,8 +16,6 @@ const navigation = [
   { name: 'Tooted', href: '/admin/products', icon: Package },
   { name: 'Puidu kokkuost', href: '/admin/wood-purchase', icon: TreeDeciduousIcon },
   { name: 'Kontakt', href: '/admin/contact', icon: Phone },
-  { name: 'Pildid', href: '/admin/images', icon: Image },
-  { name: 'Tõlked', href: '/admin/translations', icon: Globe },
   { name: 'Seaded', href: '/admin/settings', icon: Settings },
 ];
 
