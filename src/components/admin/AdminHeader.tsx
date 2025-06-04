@@ -16,7 +16,7 @@ export default function AdminHeader() {
         <div className="flex items-center space-x-4">
           <TreePine className="h-8 w-8 text-forest-700" />
           <h1 className="text-xl font-bold text-forest-800">
-            OÜ Almar Puit CMS
+            OÜ Almar Puit Haldussüsteem
           </h1>
         </div>
         

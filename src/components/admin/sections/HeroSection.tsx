@@ -26,7 +26,7 @@ export default function HeroSection() {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>Laadimine...</div>;
   }
 
   if (error) {
@@ -35,32 +35,34 @@ export default function HeroSection() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-forest-800">Hero Section</h2>
+      <h2 className="text-2xl font-bold text-forest-800">Avalehe sektsioon</h2>
 
       <div className="bg-white rounded-lg shadow p-6">
         <div className="space-y-4">
           {/* Title */}
           <div>
-            <h3 className="text-lg font-medium mb-2">Title</h3>
+            <h3 className="text-lg font-medium mb-2">Pealkiri</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Estonian
+                  Eesti keeles
                 </label>
                 <textarea
                   className="w-full p-2 border rounded-md"
                   value={translations.title?.et || ''}
                   onChange={(e) => handleTranslationChange('title', 'et', e.target.value)}
+                  placeholder="Sisesta pealkiri eesti keeles"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  English
+                  Inglise keeles
                 </label>
                 <textarea
                   className="w-full p-2 border rounded-md"
                   value={translations.title?.en || ''}
                   onChange={(e) => handleTranslationChange('title', 'en', e.target.value)}
+                  placeholder="Enter title in English"
                 />
               </div>
             </div>
@@ -68,26 +70,28 @@ export default function HeroSection() {
 
           {/* Subtitle */}
           <div>
-            <h3 className="text-lg font-medium mb-2">Subtitle</h3>
+            <h3 className="text-lg font-medium mb-2">Alampealkiri</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Estonian
+                  Eesti keeles
                 </label>
                 <textarea
                   className="w-full p-2 border rounded-md"
                   value={translations.subtitle?.et || ''}
                   onChange={(e) => handleTranslationChange('subtitle', 'et', e.target.value)}
+                  placeholder="Sisesta alampealkiri eesti keeles"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  English
+                  Inglise keeles
                 </label>
                 <textarea
                   className="w-full p-2 border rounded-md"
                   value={translations.subtitle?.en || ''}
                   onChange={(e) => handleTranslationChange('subtitle', 'en', e.target.value)}
+                  placeholder="Enter subtitle in English"
                 />
               </div>
             </div>
@@ -95,28 +99,30 @@ export default function HeroSection() {
 
           {/* CTA Button */}
           <div>
-            <h3 className="text-lg font-medium mb-2">CTA Button</h3>
+            <h3 className="text-lg font-medium mb-2">Tegevusnupp</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Estonian
+                  Eesti keeles
                 </label>
                 <input
                   type="text"
                   className="w-full p-2 border rounded-md"
                   value={translations.cta?.et || ''}
                   onChange={(e) => handleTranslationChange('cta', 'et', e.target.value)}
+                  placeholder="Sisesta nupu tekst eesti keeles"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  English
+                  Inglise keeles
                 </label>
                 <input
                   type="text"
                   className="w-full p-2 border rounded-md"
                   value={translations.cta?.en || ''}
                   onChange={(e) => handleTranslationChange('cta', 'en', e.target.value)}
+                  placeholder="Enter button text in English"
                 />
               </div>
             </div>
@@ -124,28 +130,28 @@ export default function HeroSection() {
 
           {/* Background Image */}
           <div>
-            <h3 className="text-lg font-medium mb-2">Background Image</h3>
+            <h3 className="text-lg font-medium mb-2">Taustapilt</h3>
             <div className="space-y-2">
               <input
                 type="text"
                 className="w-full p-2 border rounded-md"
                 value={images.background?.url || ''}
                 onChange={(e) => handleImageChange('background', e.target.value)}
-                placeholder="Image URL"
+                placeholder="Pildi URL"
               />
               <input
                 type="text"
                 className="w-full p-2 border rounded-md"
                 value={images.background?.alt_text || ''}
                 onChange={(e) => handleImageChange('background', images.background?.url || '', e.target.value)}
-                placeholder="Alt text"
+                placeholder="Pildi kirjeldus"
               />
             </div>
           </div>
         </div>
 
         {isSaving && (
-          <div className="mt-4 text-forest-600">Saving changes...</div>
+          <div className="mt-4 text-forest-600">Muudatuste salvestamine...</div>
         )}
       </div>
     </div>

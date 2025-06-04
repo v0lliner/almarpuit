@@ -12,15 +12,15 @@ import {
 } from 'lucide-react';
 
 const navigation = [
-  { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-  { name: 'Hero Section', href: '/admin/hero', icon: Home },
-  { name: 'About Us', href: '/admin/about', icon: Info },
-  { name: 'Products', href: '/admin/products', icon: Package },
-  { name: 'Wood Purchase', href: '/admin/wood-purchase', icon: TreeDeciduousIcon },
-  { name: 'Contact', href: '/admin/contact', icon: Phone },
-  { name: 'Images', href: '/admin/images', icon: Image },
-  { name: 'Translations', href: '/admin/translations', icon: Globe },
-  { name: 'Settings', href: '/admin/settings', icon: Settings },
+  { name: 'Töölaud', href: '/admin', icon: LayoutDashboard },
+  { name: 'Avaleht', href: '/admin/hero', icon: Home },
+  { name: 'Meist', href: '/admin/about', icon: Info },
+  { name: 'Tooted', href: '/admin/products', icon: Package },
+  { name: 'Puidu kokkuost', href: '/admin/wood-purchase', icon: TreeDeciduousIcon },
+  { name: 'Kontakt', href: '/admin/contact', icon: Phone },
+  { name: 'Pildid', href: '/admin/images', icon: Image },
+  { name: 'Tõlked', href: '/admin/translations', icon: Globe },
+  { name: 'Seaded', href: '/admin/settings', icon: Settings },
 ];
 
 export default function AdminSidebar() {

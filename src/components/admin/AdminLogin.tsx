@@ -28,7 +28,7 @@ const AdminLogin = () => {
         navigate('/admin');
       }
     } catch (err) {
-      setError('Login failed. Please check your credentials.');
+      setError('Sisselogimine ebaõnnestus. Palun kontrollige oma kasutajanime ja parooli.');
       console.error('Login error:', err);
     } finally {
       setIsLoading(false);
@@ -38,7 +38,7 @@ const AdminLogin = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-stone-100">
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
-        <h2 className="text-2xl font-bold text-forest-800 mb-6">Admin Login</h2>
+        <h2 className="text-2xl font-bold text-forest-800 mb-6">Administraatori sisselogimine</h2>
         
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
@@ -49,7 +49,7 @@ const AdminLogin = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-stone-700 mb-1">
-              Email
+              E-posti aadress
             </label>
             <input
               type="email"
@@ -64,7 +64,7 @@ const AdminLogin = () => {
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-stone-700 mb-1">
-              Password
+              Parool
             </label>
             <input
               type="password"
@@ -82,7 +82,7 @@ const AdminLogin = () => {
             className="w-full bg-forest-600 text-white py-2 px-4 rounded-md hover:bg-forest-700 focus:outline-none focus:ring-2 focus:ring-forest-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isLoading}
           >
-            {isLoading ? 'Logging in...' : 'Log In'}
+            {isLoading ? 'Sisselogimine...' : 'Logi sisse'}
           </button>
         </form>
       </div>
