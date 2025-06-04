@@ -9,7 +9,8 @@ import {
   Phone,
   Loader2,
   Languages,
-  Image
+  Image,
+  ArrowRight
 } from 'lucide-react';
 
 interface ActivityItem {
