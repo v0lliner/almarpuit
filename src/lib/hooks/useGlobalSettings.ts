@@ -18,8 +18,25 @@ interface GlobalSettings {
   };
 }
 
+const defaultSettings: GlobalSettings = {
+  company_name: '',
+  industry_address: '',
+  legal_address: '',
+  contact_phone: '',
+  contact_email: '',
+  form_target_email: '',
+  meta_title: {
+    et: '',
+    en: ''
+  },
+  meta_description: {
+    et: '',
+    en: ''
+  }
+};
+
 export function useGlobalSettings() {
-  const [settings, setSettings] = useState<GlobalSettings | null>(null);
+  const [settings, setSettings] = useState<GlobalSettings>(defaultSettings);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,14 +49,16 @@ export function useGlobalSettings() {
         .from('settings')
         .select('*')
         .eq('key', 'global_settings')
-        .single();
+        .maybeSingle();
 
       if (fetchError) throw fetchError;
 
-      setSettings(data?.value as GlobalSettings);
+      setSettings(data?.value as GlobalSettings || defaultSettings);
     } catch (err) {
       console.error('Error fetching settings:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch settings');
+      // Still set default settings even if there's an error
+      setSettings(defaultSettings);
     } finally {
       setIsLoading(false);
     }
@@ -49,18 +68,20 @@ export function useGlobalSettings() {
     try {
       setError(null);
 
+      const updatedSettings = { ...settings, ...newSettings };
+
       const { error: upsertError } = await supabase
         .from('settings')
         .upsert({
           key: 'global_settings',
-          value: { ...settings, ...newSettings }
+          value: updatedSettings
         }, {
           onConflict: 'key'
         });
 
       if (upsertError) throw upsertError;
 
-      setSettings(prev => prev ? { ...prev, ...newSettings } : null);
+      setSettings(updatedSettings);
       return true;
     } catch (err) {
       console.error('Error updating settings:', err);
