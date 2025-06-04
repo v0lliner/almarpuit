@@ -21,37 +21,47 @@ export function useContent(sectionKey: string): ContentData {
   const [images, setImages] = useState<Record<string, { url: string; alt_text: string | null }>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sectionId, setSectionId] = useState<string | null>(null);
 
   const getOrCreateSection = async (key: string) => {
-    // Try to get the section first
-    const { data: existingSection, error: fetchError } = await supabase
-      .from('sections')
-      .select('id')
-      .eq('key', key)
-      .maybeSingle();
+    try {
+      // Try to get the section first
+      const { data: existingSection, error: fetchError } = await supabase
+        .from('sections')
+        .select('id')
+        .eq('key', key)
+        .maybeSingle();
 
-    if (fetchError) throw fetchError;
+      if (fetchError) throw fetchError;
 
-    // If section exists, return it
-    if (existingSection) return existingSection;
+      // If section exists, return it
+      if (existingSection) {
+        setSectionId(existingSection.id);
+        return existingSection;
+      }
 
-    // Check if user is authenticated before creating a new section
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      // Return null for unauthenticated users
-      return null;
+      // Check if user is authenticated before creating a new section
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        // Return null for unauthenticated users
+        return null;
+      }
+
+      // If user is authenticated and section doesn't exist, create it
+      const { data: newSection, error: insertError } = await supabase
+        .from('sections')
+        .insert({ key })
+        .select('id')
+        .single();
+
+      if (insertError) throw insertError;
+
+      setSectionId(newSection.id);
+      return newSection;
+    } catch (error) {
+      console.error('Error in getOrCreateSection:', error);
+      throw error;
     }
-
-    // If user is authenticated and section doesn't exist, create it
-    const { data: newSection, error: insertError } = await supabase
-      .from('sections')
-      .insert({ key })
-      .select('id')
-      .single();
-
-    if (insertError) throw insertError;
-
-    return newSection;
   };
 
   const fetchContent = async () => {
@@ -101,22 +111,22 @@ export function useContent(sectionKey: string): ContentData {
       setImages(imagesMap);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Error in fetchContent:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
   const updateTranslation = async (key: string, lang: 'et' | 'en', value: string) => {
-    try {
-      const sectionData = await getOrCreateSection(sectionKey);
-      if (!sectionData) {
-        throw new Error('Authentication required to update translations');
-      }
+    if (!sectionId) {
+      throw new Error('Section ID not found');
+    }
 
+    try {
       const { error } = await supabase
         .from('translations')
         .upsert({
-          section_id: sectionData.id,
+          section_id: sectionId,
           key,
           [lang]: value
         }, {
@@ -125,7 +135,7 @@ export function useContent(sectionKey: string): ContentData {
 
       if (error) throw error;
 
-      // Update local state immediately
+      // Update local state immediately for better UX
       setTranslations(prev => ({
         ...prev,
         [key]: {
@@ -135,21 +145,21 @@ export function useContent(sectionKey: string): ContentData {
       }));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update translation');
+      console.error('Error in updateTranslation:', err);
       throw err;
     }
   };
 
   const updateImage = async (key: string, url: string, alt_text?: string) => {
-    try {
-      const sectionData = await getOrCreateSection(sectionKey);
-      if (!sectionData) {
-        throw new Error('Authentication required to update images');
-      }
+    if (!sectionId) {
+      throw new Error('Section ID not found');
+    }
 
+    try {
       const { error } = await supabase
         .from('images')
         .upsert({
-          section_id: sectionData.id,
+          section_id: sectionId,
           key,
           url,
           alt_text: alt_text || null
@@ -159,13 +169,14 @@ export function useContent(sectionKey: string): ContentData {
 
       if (error) throw error;
 
-      // Update local state immediately
+      // Update local state immediately for better UX
       setImages(prev => ({
         ...prev,
         [key]: { url, alt_text: alt_text || null }
       }));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update image');
+      console.error('Error in updateImage:', err);
       throw err;
     }
   };
@@ -173,27 +184,29 @@ export function useContent(sectionKey: string): ContentData {
   useEffect(() => {
     fetchContent();
 
-    // Set up real-time subscriptions
-    const channel = supabase
-      .channel(`content_changes_${sectionKey}`)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'translations',
-        filter: `section_id.eq.${sectionKey}`
-      }, fetchContent)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'images',
-        filter: `section_id.eq.${sectionKey}`
-      }, fetchContent)
-      .subscribe();
+    // Set up real-time subscriptions only if we have a section ID
+    if (sectionId) {
+      const channel = supabase
+        .channel(`content_changes_${sectionId}`)
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'translations',
+          filter: `section_id=eq.${sectionId}`
+        }, fetchContent)
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'images',
+          filter: `section_id=eq.${sectionId}`
+        }, fetchContent)
+        .subscribe();
 
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [sectionKey]);
+      return () => {
+        channel.unsubscribe();
+      };
+    }
+  }, [sectionId]); // Only re-run when sectionId changes
 
   return {
     translations,
