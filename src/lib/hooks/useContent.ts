@@ -22,19 +22,38 @@ export function useContent(sectionKey: string): ContentData {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const getOrCreateSection = async (key: string) => {
+    // Try to get the section first
+    const { data: existingSection, error: fetchError } = await supabase
+      .from('sections')
+      .select('id')
+      .eq('key', key)
+      .maybeSingle();
+
+    if (fetchError) throw fetchError;
+
+    // If section exists, return it
+    if (existingSection) return existingSection;
+
+    // If section doesn't exist, create it
+    const { data: newSection, error: insertError } = await supabase
+      .from('sections')
+      .insert({ key })
+      .select('id')
+      .single();
+
+    if (insertError) throw insertError;
+
+    return newSection;
+  };
+
   const fetchContent = async () => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Get section ID
-      const { data: sectionData, error: sectionError } = await supabase
-        .from('sections')
-        .select('id')
-        .eq('key', sectionKey)
-        .single();
-
-      if (sectionError) throw sectionError;
+      // Get or create section
+      const sectionData = await getOrCreateSection(sectionKey);
 
       // Get translations
       const { data: translationsData, error: translationsError } = await supabase
@@ -75,13 +94,7 @@ export function useContent(sectionKey: string): ContentData {
 
   const updateTranslation = async (key: string, lang: 'et' | 'en', value: string) => {
     try {
-      const { data: sectionData } = await supabase
-        .from('sections')
-        .select('id')
-        .eq('key', sectionKey)
-        .single();
-
-      if (!sectionData) throw new Error('Section not found');
+      const sectionData = await getOrCreateSection(sectionKey);
 
       const { error } = await supabase
         .from('translations')
@@ -128,13 +141,7 @@ export function useContent(sectionKey: string): ContentData {
 
   const updateImage = async (key: string, url: string, alt_text?: string) => {
     try {
-      const { data: sectionData } = await supabase
-        .from('sections')
-        .select('id')
-        .eq('key', sectionKey)
-        .single();
-
-      if (!sectionData) throw new Error('Section not found');
+      const sectionData = await getOrCreateSection(sectionKey);
 
       const { error } = await supabase
         .from('images')
