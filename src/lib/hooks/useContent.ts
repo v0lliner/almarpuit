@@ -35,7 +35,14 @@ export function useContent(sectionKey: string): ContentData {
     // If section exists, return it
     if (existingSection) return existingSection;
 
-    // If section doesn't exist, create it
+    // Check if user is authenticated before creating a new section
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      // Return null for unauthenticated users
+      return null;
+    }
+
+    // If user is authenticated and section doesn't exist, create it
     const { data: newSection, error: insertError } = await supabase
       .from('sections')
       .insert({ key })
@@ -54,6 +61,13 @@ export function useContent(sectionKey: string): ContentData {
 
       // Get or create section
       const sectionData = await getOrCreateSection(sectionKey);
+
+      // If no section data (unauthenticated user), set empty data
+      if (!sectionData) {
+        setTranslations({});
+        setImages({});
+        return;
+      }
 
       // Get translations
       const { data: translationsData, error: translationsError } = await supabase
@@ -95,6 +109,9 @@ export function useContent(sectionKey: string): ContentData {
   const updateTranslation = async (key: string, lang: 'et' | 'en', value: string) => {
     try {
       const sectionData = await getOrCreateSection(sectionKey);
+      if (!sectionData) {
+        throw new Error('Authentication required to update translations');
+      }
 
       const { error } = await supabase
         .from('translations')
@@ -142,6 +159,9 @@ export function useContent(sectionKey: string): ContentData {
   const updateImage = async (key: string, url: string, alt_text?: string) => {
     try {
       const sectionData = await getOrCreateSection(sectionKey);
+      if (!sectionData) {
+        throw new Error('Authentication required to update images');
+      }
 
       const { error } = await supabase
         .from('images')
