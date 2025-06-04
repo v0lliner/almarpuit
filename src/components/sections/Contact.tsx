@@ -100,8 +100,16 @@ const Contact = () => {
         
         <div>
           {/* Map */}
-          <div className="h-64 bg-stone-200 rounded-lg overflow-hidden shadow-md mb-6">
-            <div dangerouslySetInnerHTML={{ __html: translations.mapsEmbed?.[currentLang] || '' }} />
+          <div className="h-[400px] bg-stone-200 rounded-lg overflow-hidden shadow-md mb-6">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2086.7636245466996!2d27.657347716291172!3d57.984764381216796!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x46ea969add6e98ed%3A0x2d0c559cee36630e!2sTobrokam%C3%A4e%2C%20Mikitam%C3%A4e%2C%2064301%20P%C3%B5lva%20maakond!5e0!3m2!1set!2see!4v1651234567890!5m2!1set!2see"
+              className="w-full h-full border-0"
+              style={{ filter: 'contrast(1.2) saturate(1.1)' }}
+              allowFullScreen={true}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="OÜ Almar Puit location"
+            />
           </div>
           
           {/* Contact Form */}
