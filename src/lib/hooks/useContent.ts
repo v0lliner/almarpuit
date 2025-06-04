@@ -133,23 +133,6 @@ export function useContent(sectionKey: string): ContentData {
           [lang]: value
         }
       }));
-
-      // Subscribe to changes
-      const channel = supabase
-        .channel('translation_changes')
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'translations',
-          filter: `section_id=eq.${sectionData.id}`
-        }, () => {
-          fetchContent();
-        })
-        .subscribe();
-
-      return () => {
-        channel.unsubscribe();
-      };
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update translation');
       throw err;
@@ -181,23 +164,6 @@ export function useContent(sectionKey: string): ContentData {
         ...prev,
         [key]: { url, alt_text: alt_text || null }
       }));
-
-      // Subscribe to changes
-      const channel = supabase
-        .channel('image_changes')
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: 'images',
-          filter: `section_id=eq.${sectionData.id}`
-        }, () => {
-          fetchContent();
-        })
-        .subscribe();
-
-      return () => {
-        channel.unsubscribe();
-      };
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update image');
       throw err;
