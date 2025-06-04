@@ -1,39 +1,51 @@
 import { useTranslation } from 'react-i18next';
+import { useContent } from '../../lib/hooks/useContent';
 import AnimatedSection from '../AnimatedSection';
+import { Loader2 } from 'lucide-react';
 
 const About = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const { translations, images, isLoading } = useContent('about');
+  const currentLang = i18n.language;
+
+  if (isLoading) {
+    return (
+      <div className="section flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 text-forest-600 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <AnimatedSection id="about" animation="slide-up">
       <div 
         className="bg-white rounded-lg shadow-md p-8 relative overflow-hidden"
         style={{
-          backgroundImage: 'linear-gradient(to right, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8)), url("https://images.pexels.com/photos/129733/pexels-photo-129733.jpeg?auto=compress&cs=tinysrgb&w=1600")',
+          backgroundImage: `linear-gradient(to right, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.8)), url("${images.background?.url || 'https://images.pexels.com/photos/129733/pexels-photo-129733.jpeg?auto=compress&cs=tinysrgb&w=1600'}")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
-        <h2 className="section-title">{t('about.title')}</h2>
+        <h2 className="section-title">{translations.title?.[currentLang] || t('about.title')}</h2>
         <div className="max-w-3xl">
           <p className="text-lg leading-relaxed">
-            {t('about.description')}
+            {translations.content?.[currentLang] || t('about.description')}
           </p>
           
           <div className="mt-10 flex flex-col md:flex-row items-center gap-6">
             <div className="bg-forest-50 border border-forest-100 p-6 rounded-lg flex-1 shadow-sm">
               <p className="font-heading text-xl text-forest-700 mb-2">2006</p>
-              <p className="text-forest-600">Asutatud</p>
+              <p className="text-forest-600">{translations.foundedLabel?.[currentLang] || 'Asutatud'}</p>
             </div>
             
             <div className="bg-forest-50 border border-forest-100 p-6 rounded-lg flex-1 shadow-sm">
               <p className="font-heading text-xl text-forest-700 mb-2">PRIA</p>
-              <p className="text-forest-600">Toetatud</p>
+              <p className="text-forest-600">{translations.supportedLabel?.[currentLang] || 'Toetatud'}</p>
             </div>
             
             <div className="bg-forest-50 border border-forest-100 p-6 rounded-lg flex-1 shadow-sm">
               <p className="font-heading text-xl text-forest-700 mb-2">Kagu-Eesti</p>
-              <p className="text-forest-600">Asukoht</p>
+              <p className="text-forest-600">{translations.locationLabel?.[currentLang] || 'Asukoht'}</p>
             </div>
           </div>
         </div>
