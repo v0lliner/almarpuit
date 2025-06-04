@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, Outlet } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import AdminHeader from './AdminHeader';
 import AdminSidebar from './AdminSidebar';
+import AdminRoutes from './AdminRoutes';
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ export default function AdminLayout() {
       <div className="flex">
         <AdminSidebar />
         <main className="flex-1 p-6">
-          <Outlet />
+          <AdminRoutes />
         </main>
       </div>
     </div>
