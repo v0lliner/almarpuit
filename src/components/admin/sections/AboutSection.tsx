@@ -184,16 +184,6 @@ export default function AboutSection() {
     return editingCards[card.id]?.[field] ?? card[field] ?? '';
   };
 
-  // Helper function to get proper English title based on Estonian title
-  const getEnglishTitle = (estonianTitle: string) => {
-    const titleMap: Record<string, string> = {
-      '2006': '2006',
-      'PRIA': 'PRIA', 
-      'Kagu-Eesti': 'Southeast Estonia'
-    };
-    return titleMap[estonianTitle] || estonianTitle;
-  };
-
   if (contentLoading || cardsLoading) {
     return <div>Laadimine...</div>;
   }
@@ -436,9 +426,9 @@ export default function AboutSection() {
                         <input
                           type="text"
                           className="w-full p-2 border rounded-md"
-                          value={getEnglishTitle(getCardValue(card, 'year_number'))}
-                          onChange={(e) => handleCardFieldChange(card.id, 'year_number_en', e.target.value)}
-                          placeholder="English title"
+                          value={getCardValue(card, 'year_number')}
+                          onChange={(e) => handleCardFieldChange(card.id, 'year_number', e.target.value)}
+                          placeholder="Same as ET for now"
                         />
                       </div>
                     </div>

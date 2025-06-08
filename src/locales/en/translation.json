@@ -28,18 +28,6 @@
         "region": "Southeast Estonia",
         "label": "Location"
       }
-    },
-    "milestones": {
-      "titles": {
-        "2006": "2006",
-        "PRIA": "PRIA",
-        "Kagu-Eesti": "Southeast Estonia"
-      },
-      "descriptions": {
-        "Asutatud": "Founded",
-        "Toetatud": "Supported by",
-        "Asukoht": "Location"
-      }
     }
   },
   "products": {
