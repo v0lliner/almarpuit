@@ -14,7 +14,21 @@
   },
   "about": {
     "title": "Meist",
-    "description": "OÜ Almar Puit on 2006. aastal Kagu-Eestis asutatud ettevõte, mis toob looduse lähemale. Pakume keskkonnasõbralikke lahendusi koduaedadele ja puhkealadele ning kvaliteetseid kütte- ja kaminapuid. Meie pühendumus innovatsioonile paistab silma PRIA toetustega, mis on aidanud meil automatiseerida tootmisprotsessi, tagades parima kvaliteedi ja kiire tarne."
+    "description": "OÜ Almar Puit on 2006. aastal Kagu-Eestis asutatud ettevõte, mis toob looduse lähemale. Pakume keskkonnasõbralikke lahendusi koduaedadele ja puhkealadele ning kvaliteetseid kütte- ja kaminapuid. Meie pühendumus innovatsioonile paistab silma PRIA toetustega, mis on aidanud meil automatiseerida tootmisprotsessi, tagades parima kvaliteedi ja kiire tarne.",
+    "stats": {
+      "founded": {
+        "year": "2006",
+        "label": "Asutatud"
+      },
+      "supported": {
+        "organization": "PRIA",
+        "label": "Toetatud"
+      },
+      "location": {
+        "region": "Kagu-Eesti",
+        "label": "Asukoht"
+      }
+    }
   },
   "products": {
     "title": "Meie tooted",
@@ -30,7 +44,15 @@
   "woodPurchase": {
     "title": "Puidu kokkuost",
     "description": "Otsime usaldusväärseid tarnijaid! Ostame kasepaberipuid, 3 m küttepuud ja piiratud koguses palki. Võta ühendust ja alustame koostööd.",
-    "cta": "Paku oma puitu"
+    "cta": "Paku oma puitu",
+    "lookingFor": {
+      "title": "Otsime:",
+      "items": {
+        "birchPaper": "Kasepaberipuud",
+        "heatingWood3m": "3m küttepuud",
+        "limitedLogs": "Piiratud koguses palki"
+      }
+    }
   },
   "contact": {
     "title": "Kontakt",

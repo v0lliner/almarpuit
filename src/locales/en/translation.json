@@ -14,7 +14,21 @@
   },
   "about": {
     "title": "About Us",
-    "description": "Founded in 2006 in Southeast Estonia, OÜ Almar Puit brings nature closer to you. We offer eco-friendly solutions for gardens and recreational areas, alongside premium heating and fireplace wood. Our commitment to innovation shines through PRIA funding, enabling us to automate production for top quality and fast delivery."
+    "description": "Founded in 2006 in Southeast Estonia, OÜ Almar Puit brings nature closer to you. We offer eco-friendly solutions for gardens and recreational areas, alongside premium heating and fireplace wood. Our commitment to innovation shines through PRIA funding, enabling us to automate production for top quality and fast delivery.",
+    "stats": {
+      "founded": {
+        "year": "2006",
+        "label": "Founded"
+      },
+      "supported": {
+        "organization": "PRIA",
+        "label": "Supported by"
+      },
+      "location": {
+        "region": "Southeast Estonia",
+        "label": "Location"
+      }
+    }
   },
   "products": {
     "title": "Our Products",
@@ -30,7 +44,15 @@
   "woodPurchase": {
     "title": "Wood Purchase",
     "description": "We're looking for reliable suppliers! We purchase birch paper wood, 3 m heating wood, and limited quantities of logs. Contact us to start a partnership.",
-    "cta": "Offer your wood"
+    "cta": "Offer your wood",
+    "lookingFor": {
+      "title": "Looking for:",
+      "items": {
+        "birchPaper": "Birch paper wood",
+        "heatingWood3m": "3m heating wood",
+        "limitedLogs": "Limited quantities of logs"
+      }
+    }
   },
   "contact": {
     "title": "Contact Us",

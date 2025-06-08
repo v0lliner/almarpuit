@@ -34,18 +34,30 @@ const About = () => {
           
           <div className="mt-10 flex flex-col md:flex-row items-center gap-6">
             <div className="bg-forest-50 border border-forest-100 p-6 rounded-lg flex-1 shadow-sm">
-              <p className="font-heading text-xl text-forest-700 mb-2">2006</p>
-              <p className="text-forest-600">{translations.foundedLabel?.[currentLang] || 'Asutatud'}</p>
+              <p className="font-heading text-xl text-forest-700 mb-2">
+                {t('about.stats.founded.year')}
+              </p>
+              <p className="text-forest-600">
+                {t('about.stats.founded.label')}
+              </p>
             </div>
             
             <div className="bg-forest-50 border border-forest-100 p-6 rounded-lg flex-1 shadow-sm">
-              <p className="font-heading text-xl text-forest-700 mb-2">PRIA</p>
-              <p className="text-forest-600">{translations.supportedLabel?.[currentLang] || 'Toetatud'}</p>
+              <p className="font-heading text-xl text-forest-700 mb-2">
+                {t('about.stats.supported.organization')}
+              </p>
+              <p className="text-forest-600">
+                {t('about.stats.supported.label')}
+              </p>
             </div>
             
             <div className="bg-forest-50 border border-forest-100 p-6 rounded-lg flex-1 shadow-sm">
-              <p className="font-heading text-xl text-forest-700 mb-2">Kagu-Eesti</p>
-              <p className="text-forest-600">{translations.locationLabel?.[currentLang] || 'Asukoht'}</p>
+              <p className="font-heading text-xl text-forest-700 mb-2">
+                {t('about.stats.location.region')}
+              </p>
+              <p className="text-forest-600">
+                {t('about.stats.location.label')}
+              </p>
             </div>
           </div>
         </div>
