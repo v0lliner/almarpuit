@@ -1,24 +1,41 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useContent } from '../../../lib/hooks/useContent';
+import { useMilestoneCards } from '../../../lib/hooks/useMilestoneCards';
 import { supabase } from '../../../lib/supabase';
-import { Loader2, Upload, X, Check } from 'lucide-react';
+import { Loader2, Upload, X, Check, Plus, Trash2, GripVertical } from 'lucide-react';
 
 export default function AboutSection() {
   const {
     translations,
     images,
-    isLoading,
-    error,
+    isLoading: contentLoading,
+    error: contentError,
     updateTranslation,
     updateImage,
     refetch
   } = useContent('about');
 
+  const {
+    cards,
+    isLoading: cardsLoading,
+    error: cardsError,
+    createCard,
+    updateCard,
+    deleteCard,
+    reorderCards
+  } = useMilestoneCards('about');
+
   const [isSaving, setIsSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [formError, setFormError] = useState<string | null>(null);
+  const [newCard, setNewCard] = useState({
+    year_number: '',
+    description_et: '',
+    description_en: ''
+  });
+  const [showAddCard, setShowAddCard] = useState(false);
 
   const handleTranslationChange = async (key: string, lang: 'et' | 'en', value: string) => {
     try {
@@ -98,12 +115,56 @@ export default function AboutSection() {
     }
   };
 
-  if (isLoading) {
+  const handleAddCard = async () => {
+    if (!newCard.year_number || !newCard.description_et || !newCard.description_en) {
+      setFormError('Kõik väljad on kohustuslikud');
+      return;
+    }
+
+    try {
+      await createCard({
+        section_id: '', // Will be set by the hook
+        year_number: newCard.year_number,
+        description_et: newCard.description_et,
+        description_en: newCard.description_en,
+        sort_order: cards.length + 1
+      });
+      
+      setNewCard({ year_number: '', description_et: '', description_en: '' });
+      setShowAddCard(false);
+      setFormError(null);
+    } catch (err) {
+      setFormError('Kaardi lisamine ebaõnnestus');
+      console.error('Add card error:', err);
+    }
+  };
+
+  const handleUpdateCard = async (id: string, field: string, value: string) => {
+    try {
+      await updateCard(id, { [field]: value });
+    } catch (err) {
+      setFormError('Kaardi uuendamine ebaõnnestus');
+      console.error('Update card error:', err);
+    }
+  };
+
+  const handleDeleteCard = async (id: string) => {
+    if (!confirm('Kas oled kindel, et soovid selle kaardi kustutada?')) return;
+
+    try {
+      await deleteCard(id);
+    } catch (err) {
+      setFormError('Kaardi kustutamine ebaõnnestus');
+      console.error('Delete card error:', err);
+    }
+  };
+
+  if (contentLoading || cardsLoading) {
     return <div>Laadimine...</div>;
   }
 
-  if (error) {
-    return <div className="text-red-600">{error}</div>;
+  if (contentError || cardsError) {
+    return <div className="text-red-600">{contentError || cardsError}</div>;
   }
 
   return (
@@ -210,6 +271,137 @@ export default function AboutSection() {
                   placeholder="Enter main content in English"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Milestone Cards */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium">Verstapostid</h3>
+              <button
+                onClick={() => setShowAddCard(true)}
+                className="flex items-center space-x-2 px-4 py-2 bg-forest-600 text-white rounded-md hover:bg-forest-700"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Lisa uus kaart</span>
+              </button>
+            </div>
+
+            {/* Add New Card Form */}
+            {showAddCard && (
+              <div className="bg-gray-50 p-4 rounded-md mb-4">
+                <h4 className="font-medium mb-3">Lisa uus verstapost</h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Aasta/Number
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full p-2 border rounded-md"
+                      value={newCard.year_number}
+                      onChange={(e) => setNewCard({ ...newCard, year_number: e.target.value })}
+                      placeholder="nt. 2006"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Kirjeldus (ET)
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full p-2 border rounded-md"
+                      value={newCard.description_et}
+                      onChange={(e) => setNewCard({ ...newCard, description_et: e.target.value })}
+                      placeholder="nt. Asutatud"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Kirjeldus (EN)
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full p-2 border rounded-md"
+                      value={newCard.description_en}
+                      onChange={(e) => setNewCard({ ...newCard, description_en: e.target.value })}
+                      placeholder="e.g. Founded"
+                    />
+                  </div>
+                </div>
+                <div className="flex space-x-2 mt-4">
+                  <button
+                    onClick={handleAddCard}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                  >
+                    Lisa
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowAddCard(false);
+                      setNewCard({ year_number: '', description_et: '', description_en: '' });
+                    }}
+                    className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+                  >
+                    Tühista
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Existing Cards */}
+            <div className="space-y-4">
+              {cards.map((card) => (
+                <div key={card.id} className="bg-gray-50 p-4 rounded-md">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-2">
+                      <GripVertical className="w-4 h-4 text-gray-400" />
+                      <h4 className="font-medium">Verstapost #{card.sort_order}</h4>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteCard(card.id)}
+                      className="p-1 text-red-600 hover:text-red-800"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Aasta/Number
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md"
+                        value={card.year_number}
+                        onChange={(e) => handleUpdateCard(card.id, 'year_number', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Kirjeldus (ET)
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md"
+                        value={card.description_et}
+                        onChange={(e) => handleUpdateCard(card.id, 'description_et', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Kirjeldus (EN)
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md"
+                        value={card.description_en}
+                        onChange={(e) => handleUpdateCard(card.id, 'description_en', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 

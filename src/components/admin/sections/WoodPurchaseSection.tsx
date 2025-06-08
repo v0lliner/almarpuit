@@ -1,24 +1,37 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useContent } from '../../../lib/hooks/useContent';
+import { useProductRequirements } from '../../../lib/hooks/useProductRequirements';
 import { supabase } from '../../../lib/supabase';
-import { Loader2, Upload, X, Check } from 'lucide-react';
+import { Loader2, Upload, X, Check, Plus, Trash2, GripVertical } from 'lucide-react';
 
 export default function WoodPurchaseSection() {
   const {
     translations,
     images,
-    isLoading,
-    error,
+    isLoading: contentLoading,
+    error: contentError,
     updateTranslation,
     updateImage,
     refetch
   } = useContent('woodPurchase');
 
+  const {
+    requirement,
+    isLoading: requirementLoading,
+    error: requirementError,
+    updateRequirement,
+    addItem,
+    updateItem,
+    removeItem
+  } = useProductRequirements('woodPurchase');
+
   const [isSaving, setIsSaving] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [formError, setFormError] = useState<string | null>(null);
+  const [newItem, setNewItem] = useState({ et: '', en: '' });
+  const [showAddItem, setShowAddItem] = useState(false);
 
   const handleTranslationChange = async (key: string, lang: 'et' | 'en', value: string) => {
     try {
@@ -98,12 +111,61 @@ export default function WoodPurchaseSection() {
     }
   };
 
-  if (isLoading) {
+  const handleAddItem = async () => {
+    if (!newItem.et || !newItem.en) {
+      setFormError('Mõlemad keeled on kohustuslikud');
+      return;
+    }
+
+    try {
+      await addItem(newItem);
+      setNewItem({ et: '', en: '' });
+      setShowAddItem(false);
+      setFormError(null);
+    } catch (err) {
+      setFormError('Elemendi lisamine ebaõnnestus');
+      console.error('Add item error:', err);
+    }
+  };
+
+  const handleUpdateItem = async (index: number, field: 'et' | 'en', value: string) => {
+    if (!requirement) return;
+
+    try {
+      const updatedItem = { ...requirement.items[index], [field]: value };
+      await updateItem(index, updatedItem);
+    } catch (err) {
+      setFormError('Elemendi uuendamine ebaõnnestus');
+      console.error('Update item error:', err);
+    }
+  };
+
+  const handleRemoveItem = async (index: number) => {
+    if (!confirm('Kas oled kindel, et soovid selle elemendi kustutada?')) return;
+
+    try {
+      await removeItem(index);
+    } catch (err) {
+      setFormError('Elemendi kustutamine ebaõnnestus');
+      console.error('Remove item error:', err);
+    }
+  };
+
+  const handleUpdateRequirementTitle = async (field: 'title_et' | 'title_en', value: string) => {
+    try {
+      await updateRequirement({ [field]: value });
+    } catch (err) {
+      setFormError('Pealkirja uuendamine ebaõnnestus');
+      console.error('Update title error:', err);
+    }
+  };
+
+  if (contentLoading || requirementLoading) {
     return <div>Laadimine...</div>;
   }
 
-  if (error) {
-    return <div className="text-red-600">{error}</div>;
+  if (contentError || requirementError) {
+    return <div className="text-red-600">{contentError || requirementError}</div>;
   }
 
   return (
@@ -241,6 +303,145 @@ export default function WoodPurchaseSection() {
                   placeholder="Enter button text in English"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Product Requirements */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-medium">Toote nõuded</h3>
+              <button
+                onClick={() => setShowAddItem(true)}
+                className="flex items-center space-x-2 px-4 py-2 bg-forest-600 text-white rounded-md hover:bg-forest-700"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Lisa uus element</span>
+              </button>
+            </div>
+
+            {/* Requirements Title */}
+            <div className="mb-4">
+              <h4 className="font-medium mb-2">Nimekirja pealkiri</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Eesti keeles
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full p-2 border rounded-md"
+                    value={requirement?.title_et || ''}
+                    onChange={(e) => handleUpdateRequirementTitle('title_et', e.target.value)}
+                    placeholder="nt. Otsime:"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Inglise keeles
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full p-2 border rounded-md"
+                    value={requirement?.title_en || ''}
+                    onChange={(e) => handleUpdateRequirementTitle('title_en', e.target.value)}
+                    placeholder="e.g. Looking for:"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Add New Item Form */}
+            {showAddItem && (
+              <div className="bg-gray-50 p-4 rounded-md mb-4">
+                <h4 className="font-medium mb-3">Lisa uus element</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Eesti keeles
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full p-2 border rounded-md"
+                      value={newItem.et}
+                      onChange={(e) => setNewItem({ ...newItem, et: e.target.value })}
+                      placeholder="nt. Kasepaberipuud"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Inglise keeles
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full p-2 border rounded-md"
+                      value={newItem.en}
+                      onChange={(e) => setNewItem({ ...newItem, en: e.target.value })}
+                      placeholder="e.g. Birch paper wood"
+                    />
+                  </div>
+                </div>
+                <div className="flex space-x-2 mt-4">
+                  <button
+                    onClick={handleAddItem}
+                    className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                  >
+                    Lisa
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowAddItem(false);
+                      setNewItem({ et: '', en: '' });
+                    }}
+                    className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+                  >
+                    Tühista
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Existing Items */}
+            <div className="space-y-4">
+              {requirement?.items?.map((item, index) => (
+                <div key={index} className="bg-gray-50 p-4 rounded-md">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center space-x-2">
+                      <GripVertical className="w-4 h-4 text-gray-400" />
+                      <h4 className="font-medium">Element #{index + 1}</h4>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveItem(index)}
+                      className="p-1 text-red-600 hover:text-red-800"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Eesti keeles
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md"
+                        value={item.et}
+                        onChange={(e) => handleUpdateItem(index, 'et', e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Inglise keeles
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md"
+                        value={item.en}
+                        onChange={(e) => handleUpdateItem(index, 'en', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 

@@ -1,14 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { useContent } from '../../lib/hooks/useContent';
+import { useMilestoneCards } from '../../lib/hooks/useMilestoneCards';
 import AnimatedSection from '../AnimatedSection';
 import { Loader2 } from 'lucide-react';
 
 const About = () => {
   const { t, i18n } = useTranslation();
-  const { translations, images, isLoading } = useContent('about');
+  const { translations, images, isLoading: contentLoading } = useContent('about');
+  const { cards, isLoading: cardsLoading } = useMilestoneCards('about');
   const currentLang = i18n.language;
 
-  if (isLoading) {
+  if (contentLoading || cardsLoading) {
     return (
       <div className="section flex items-center justify-center min-h-[400px]">
         <Loader2 className="w-8 h-8 text-forest-600 animate-spin" />
@@ -33,32 +35,48 @@ const About = () => {
           </p>
           
           <div className="mt-10 flex flex-col md:flex-row items-center gap-6">
-            <div className="bg-forest-50 border border-forest-100 p-6 rounded-lg flex-1 shadow-sm">
-              <p className="font-heading text-xl text-forest-700 mb-2">
-                {t('about.stats.founded.year')}
-              </p>
-              <p className="text-forest-600">
-                {t('about.stats.founded.label')}
-              </p>
-            </div>
-            
-            <div className="bg-forest-50 border border-forest-100 p-6 rounded-lg flex-1 shadow-sm">
-              <p className="font-heading text-xl text-forest-700 mb-2">
-                {t('about.stats.supported.organization')}
-              </p>
-              <p className="text-forest-600">
-                {t('about.stats.supported.label')}
-              </p>
-            </div>
-            
-            <div className="bg-forest-50 border border-forest-100 p-6 rounded-lg flex-1 shadow-sm">
-              <p className="font-heading text-xl text-forest-700 mb-2">
-                {t('about.stats.location.region')}
-              </p>
-              <p className="text-forest-600">
-                {t('about.stats.location.label')}
-              </p>
-            </div>
+            {cards.length > 0 ? (
+              cards.map((card) => (
+                <div key={card.id} className="bg-forest-50 border border-forest-100 p-6 rounded-lg flex-1 shadow-sm">
+                  <p className="font-heading text-xl text-forest-700 mb-2">
+                    {card.year_number}
+                  </p>
+                  <p className="text-forest-600">
+                    {currentLang === 'et' ? card.description_et : card.description_en}
+                  </p>
+                </div>
+              ))
+            ) : (
+              // Fallback to translation files if no cards in database
+              <>
+                <div className="bg-forest-50 border border-forest-100 p-6 rounded-lg flex-1 shadow-sm">
+                  <p className="font-heading text-xl text-forest-700 mb-2">
+                    {t('about.stats.founded.year')}
+                  </p>
+                  <p className="text-forest-600">
+                    {t('about.stats.founded.label')}
+                  </p>
+                </div>
+                
+                <div className="bg-forest-50 border border-forest-100 p-6 rounded-lg flex-1 shadow-sm">
+                  <p className="font-heading text-xl text-forest-700 mb-2">
+                    {t('about.stats.supported.organization')}
+                  </p>
+                  <p className="text-forest-600">
+                    {t('about.stats.supported.label')}
+                  </p>
+                </div>
+                
+                <div className="bg-forest-50 border border-forest-100 p-6 rounded-lg flex-1 shadow-sm">
+                  <p className="font-heading text-xl text-forest-700 mb-2">
+                    {t('about.stats.location.region')}
+                  </p>
+                  <p className="text-forest-600">
+                    {t('about.stats.location.label')}
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>

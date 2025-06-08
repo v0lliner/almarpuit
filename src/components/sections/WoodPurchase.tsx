@@ -1,15 +1,17 @@
 import { useTranslation } from 'react-i18next';
 import { useContent } from '../../lib/hooks/useContent';
+import { useProductRequirements } from '../../lib/hooks/useProductRequirements';
 import AnimatedSection from '../AnimatedSection';
 import Button from '../Button';
 import { TreeDeciduousIcon, Loader2 } from 'lucide-react';
 
 const WoodPurchase = () => {
   const { t, i18n } = useTranslation();
-  const { translations, images, isLoading } = useContent('woodPurchase');
+  const { translations, images, isLoading: contentLoading } = useContent('woodPurchase');
+  const { requirement, isLoading: requirementLoading } = useProductRequirements('woodPurchase');
   const currentLang = i18n.language;
 
-  if (isLoading) {
+  if (contentLoading || requirementLoading) {
     return (
       <div className="section flex items-center justify-center min-h-[400px]">
         <Loader2 className="w-8 h-8 text-forest-600 animate-spin" />
@@ -56,21 +58,36 @@ const WoodPurchase = () => {
             
             <div className="bg-forest-600/60 backdrop-blur-sm p-6 rounded-lg">
               <h3 className="text-xl font-bold mb-4 text-white">
-                {t('woodPurchase.lookingFor.title')}
+                {requirement 
+                  ? (currentLang === 'et' ? requirement.title_et : requirement.title_en)
+                  : t('woodPurchase.lookingFor.title')
+                }
               </h3>
               <ul className="space-y-3">
-                <li className="flex items-center">
-                  <span className="h-2 w-2 bg-amber-400 rounded-full mr-2"></span>
-                  <span>{t('woodPurchase.lookingFor.items.birchPaper')}</span>
-                </li>
-                <li className="flex items-center">
-                  <span className="h-2 w-2 bg-amber-400 rounded-full mr-2"></span>
-                  <span>{t('woodPurchase.lookingFor.items.heatingWood3m')}</span>
-                </li>
-                <li className="flex items-center">
-                  <span className="h-2 w-2 bg-amber-400 rounded-full mr-2"></span>
-                  <span>{t('woodPurchase.lookingFor.items.limitedLogs')}</span>
-                </li>
+                {requirement && requirement.items.length > 0 ? (
+                  requirement.items.map((item, index) => (
+                    <li key={index} className="flex items-center">
+                      <span className="h-2 w-2 bg-amber-400 rounded-full mr-2"></span>
+                      <span>{currentLang === 'et' ? item.et : item.en}</span>
+                    </li>
+                  ))
+                ) : (
+                  // Fallback to translation files if no requirements in database
+                  <>
+                    <li className="flex items-center">
+                      <span className="h-2 w-2 bg-amber-400 rounded-full mr-2"></span>
+                      <span>{t('woodPurchase.lookingFor.items.birchPaper')}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <span className="h-2 w-2 bg-amber-400 rounded-full mr-2"></span>
+                      <span>{t('woodPurchase.lookingFor.items.heatingWood3m')}</span>
+                    </li>
+                    <li className="flex items-center">
+                      <span className="h-2 w-2 bg-amber-400 rounded-full mr-2"></span>
+                      <span>{t('woodPurchase.lookingFor.items.limitedLogs')}</span>
+                    </li>
+                  </>
+                )}
               </ul>
             </div>
           </div>
