@@ -31,11 +31,13 @@ export default function AboutSection() {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [formError, setFormError] = useState<string | null>(null);
   const [newCard, setNewCard] = useState({
-    year_number: '',
+    title_et: '',
+    title_en: '',
     description_et: '',
     description_en: ''
   });
   const [showAddCard, setShowAddCard] = useState(false);
+  const [editingCards, setEditingCards] = useState<Record<string, any>>({});
 
   const handleTranslationChange = async (key: string, lang: 'et' | 'en', value: string) => {
     try {
@@ -105,6 +107,18 @@ export default function AboutSection() {
   const handleSaveAll = async () => {
     try {
       setSaveStatus('saving');
+      setFormError(null);
+
+      // Save all pending card changes
+      for (const [cardId, cardData] of Object.entries(editingCards)) {
+        if (cardData) {
+          await updateCard(cardId, cardData);
+        }
+      }
+
+      // Clear editing state
+      setEditingCards({});
+      
       await refetch();
       setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 2000);
@@ -116,7 +130,7 @@ export default function AboutSection() {
   };
 
   const handleAddCard = async () => {
-    if (!newCard.year_number || !newCard.description_et || !newCard.description_en) {
+    if (!newCard.title_et || !newCard.title_en || !newCard.description_et || !newCard.description_en) {
       setFormError('Kõik väljad on kohustuslikud');
       return;
     }
@@ -124,13 +138,13 @@ export default function AboutSection() {
     try {
       await createCard({
         section_id: '', // Will be set by the hook
-        year_number: newCard.year_number,
+        year_number: newCard.title_et, // Using title_et as year_number for backward compatibility
         description_et: newCard.description_et,
         description_en: newCard.description_en,
         sort_order: cards.length + 1
       });
       
-      setNewCard({ year_number: '', description_et: '', description_en: '' });
+      setNewCard({ title_et: '', title_en: '', description_et: '', description_en: '' });
       setShowAddCard(false);
       setFormError(null);
     } catch (err) {
@@ -139,13 +153,14 @@ export default function AboutSection() {
     }
   };
 
-  const handleUpdateCard = async (id: string, field: string, value: string) => {
-    try {
-      await updateCard(id, { [field]: value });
-    } catch (err) {
-      setFormError('Kaardi uuendamine ebaõnnestus');
-      console.error('Update card error:', err);
-    }
+  const handleCardFieldChange = (cardId: string, field: string, value: string) => {
+    setEditingCards(prev => ({
+      ...prev,
+      [cardId]: {
+        ...prev[cardId],
+        [field]: value
+      }
+    }));
   };
 
   const handleDeleteCard = async (id: string) => {
@@ -153,10 +168,20 @@ export default function AboutSection() {
 
     try {
       await deleteCard(id);
+      // Remove from editing state if it was being edited
+      setEditingCards(prev => {
+        const newState = { ...prev };
+        delete newState[id];
+        return newState;
+      });
     } catch (err) {
       setFormError('Kaardi kustutamine ebaõnnestus');
       console.error('Delete card error:', err);
     }
+  };
+
+  const getCardValue = (card: any, field: string) => {
+    return editingCards[card.id]?.[field] ?? card[field] ?? '';
   };
 
   if (contentLoading || cardsLoading) {
@@ -291,42 +316,58 @@ export default function AboutSection() {
             {showAddCard && (
               <div className="bg-gray-50 p-4 rounded-md mb-4">
                 <h4 className="font-medium mb-3">Lisa uus verstapost</h4>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Aasta/Number
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full p-2 border rounded-md"
-                      value={newCard.year_number}
-                      onChange={(e) => setNewCard({ ...newCard, year_number: e.target.value })}
-                      placeholder="nt. 2006"
-                    />
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Pealkiri (ET)
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md"
+                        value={newCard.title_et}
+                        onChange={(e) => setNewCard({ ...newCard, title_et: e.target.value })}
+                        placeholder="nt. 2006"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Pealkiri (EN)
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md"
+                        value={newCard.title_en}
+                        onChange={(e) => setNewCard({ ...newCard, title_en: e.target.value })}
+                        placeholder="e.g. 2006"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Kirjeldus (ET)
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full p-2 border rounded-md"
-                      value={newCard.description_et}
-                      onChange={(e) => setNewCard({ ...newCard, description_et: e.target.value })}
-                      placeholder="nt. Asutatud"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Kirjeldus (EN)
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full p-2 border rounded-md"
-                      value={newCard.description_en}
-                      onChange={(e) => setNewCard({ ...newCard, description_en: e.target.value })}
-                      placeholder="e.g. Founded"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Kirjeldus (ET)
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md"
+                        value={newCard.description_et}
+                        onChange={(e) => setNewCard({ ...newCard, description_et: e.target.value })}
+                        placeholder="nt. Asutatud"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Kirjeldus (EN)
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full p-2 border rounded-md"
+                        value={newCard.description_en}
+                        onChange={(e) => setNewCard({ ...newCard, description_en: e.target.value })}
+                        placeholder="e.g. Founded"
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="flex space-x-2 mt-4">
@@ -339,7 +380,7 @@ export default function AboutSection() {
                   <button
                     onClick={() => {
                       setShowAddCard(false);
-                      setNewCard({ year_number: '', description_et: '', description_en: '' });
+                      setNewCard({ title_et: '', title_en: '', description_et: '', description_en: '' });
                     }}
                     className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
                   >
@@ -365,39 +406,55 @@ export default function AboutSection() {
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Aasta/Number
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full p-2 border rounded-md"
-                        value={card.year_number}
-                        onChange={(e) => handleUpdateCard(card.id, 'year_number', e.target.value)}
-                      />
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Pealkiri (ET)
+                        </label>
+                        <input
+                          type="text"
+                          className="w-full p-2 border rounded-md"
+                          value={getCardValue(card, 'year_number')}
+                          onChange={(e) => handleCardFieldChange(card.id, 'year_number', e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Pealkiri (EN)
+                        </label>
+                        <input
+                          type="text"
+                          className="w-full p-2 border rounded-md"
+                          value={getCardValue(card, 'year_number')}
+                          onChange={(e) => handleCardFieldChange(card.id, 'year_number', e.target.value)}
+                          placeholder="Same as ET for now"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Kirjeldus (ET)
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full p-2 border rounded-md"
-                        value={card.description_et}
-                        onChange={(e) => handleUpdateCard(card.id, 'description_et', e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Kirjeldus (EN)
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full p-2 border rounded-md"
-                        value={card.description_en}
-                        onChange={(e) => handleUpdateCard(card.id, 'description_en', e.target.value)}
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Kirjeldus (ET)
+                        </label>
+                        <input
+                          type="text"
+                          className="w-full p-2 border rounded-md"
+                          value={getCardValue(card, 'description_et')}
+                          onChange={(e) => handleCardFieldChange(card.id, 'description_et', e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Kirjeldus (EN)
+                        </label>
+                        <input
+                          type="text"
+                          className="w-full p-2 border rounded-md"
+                          value={getCardValue(card, 'description_en')}
+                          onChange={(e) => handleCardFieldChange(card.id, 'description_en', e.target.value)}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -457,7 +514,7 @@ export default function AboutSection() {
                 <p className="text-sm text-gray-600 mt-1">
                   Üleslaadimine: {Math.round(uploadProgress)}%
                 </p>
-              </div>
+                </div>
             )}
 
             {/* Alt Text Input */}
